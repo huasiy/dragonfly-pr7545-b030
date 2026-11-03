@@ -1,0 +1,31 @@
+// Copyright 2023, DragonflyDB authors.  All rights reserved.
+// See LICENSE for licensing terms.
+//
+
+#pragma once
+
+#include "core/search/base.h"
+
+namespace dfly::search {
+
+// Initializes SimSIMD runtime if dynamic dispatch is enabled.
+void InitSimSIMD();
+
+OwnedFtVector BytesToFtVector(std::string_view value);
+
+// Returns std::nullopt if value can not be converted to the vector
+// TODO: Remove unsafe version
+std::optional<OwnedFtVector> BytesToFtVectorSafe(std::string_view value);
+
+float L2Distance(const float* u, const float* v, size_t dims);
+float IPDistance(const float* u, const float* v, size_t dims);
+float CosineDistance(const float* u, const float* v, size_t dims);
+float VectorDistance(const float* u, const float* v, size_t dims, VectorSimilarity sim);
+
+std::string_view VectorSimilarityToString(VectorSimilarity sim);
+
+// L2: 1/(1+d*d) -- knn_dist is raw L2 here, so squaring matches the 1/(1+L2_sq) similarity.
+// IP/COSINE: (2-d)/2 -- knn_dist is (1 - score) for both metrics.
+float DistanceToSimilarity(float distance, VectorSimilarity sim);
+
+}  // namespace dfly::search
